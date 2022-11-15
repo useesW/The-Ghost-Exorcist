@@ -30,10 +30,10 @@ public struct BoidCalculation : IJob{
     public NativeArray<Vector3> steers;
 #endregion
 
-
+// Boids Algorithm -> [https://www.youtube.com/watch?v=mhjuuHl6qHM&t=2211s]
     public void Execute(){
         for(int i = startingIndex; i < endIndex; i++){ // loop through all designated NPCs
-            Vector3 desiredVelocity = Vector3.zero;
+            Vector3 desiredVelocity = steers[i];
             Vector3 desiredPosition = Vector3.zero;
             Vector3 desiredOffset = Vector3.zero;
             
@@ -41,7 +41,7 @@ public struct BoidCalculation : IJob{
                 if(i == j) {continue;} // Don't compare to self
 
                 if((positions[j] - positions[i]).magnitude <= aRange){
-                    desiredVelocity += (steers[i] + steers[j]);
+                    desiredVelocity += steers[j];
                 }
                 if((positions[j] - positions[i]).magnitude <= cRange){
                     desiredPosition += (positions[j] - positions[i]);
