@@ -6,13 +6,13 @@ using UnityEngine;
 
 public class Node
 {
-    public bool walkable;
+    public bool walkable; 
     public Vector3 worldPosition;
     public int gridX;
     public int gridY;
 
-    public int gCost;
-    public int hCost;
+    public int gCost; // distance from the starting node
+    public int hCost; // distance from the ending node
     public Node Parent;
 
     public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY)

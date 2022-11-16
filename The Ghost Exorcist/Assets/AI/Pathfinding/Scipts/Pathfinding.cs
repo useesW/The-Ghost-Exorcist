@@ -25,11 +25,13 @@ public class Pathfinding : MonoBehaviour
 
         List<Node> openSet = new List<Node>(); 
         HashSet<Node> closedSet = new HashSet<Node>();  
-        openSet.Add(startNode); 
+        openSet.Add(startNode); // Start check at starting position
 
+        // Loop unitl target node is found
         while (openSet.Count > 0)
         {
             Node currentNode = openSet[0]; 
+            // Find node with lowest F cost -> evaluate node
             for (int i = 1; i < openSet.Count; i++)
             {
                 if (openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost)
@@ -37,6 +39,8 @@ public class Pathfinding : MonoBehaviour
                     currentNode = openSet[i];
                 }
             }
+
+            // Move current node to closed set (now being evaluated)
             openSet.Remove(currentNode);
             closedSet.Add(currentNode);
 
@@ -46,13 +50,16 @@ public class Pathfinding : MonoBehaviour
                 return;
             }
 
-             foreach (Node neighbour in grid.GetNeighbours(currentNode))
+            foreach (Node neighbour in grid.GetNeighbours(currentNode))
             {
-                if (!neighbour.walkable | closedSet.Contains(neighbour))
+                // Avoid checking non walkable nodes or nodes that have already been checked
+                if (!neighbour.walkable || closedSet.Contains(neighbour))
                 {
                     continue;
                 }
+                // Calculate neighbour G cost
                 int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+                // If faster g cost or node has not been evaluated
                 if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
                 {
                     neighbour.gCost = newMovementCostToNeighbour;
