@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3341792989910910250}
   - component: {fileID: 3341792989910910249}
   - component: {fileID: 3341792989910910248}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3341792990430791148}
   - component: {fileID: 2806628972662005510}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Boid_NPC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,3 +143,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a15da727b9c68946967a772ec561032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ID: 0
+  movementSpeed: 0.1
+  obstacleCheckRange: 5
+  drawPath: 1
+  pathCheckRange: 1
+  pathFollowWeigth: 5
+  NPCMat: {fileID: 2100000, guid: 4ec42d0fc62a1cc4c9224df4071c04a2, type: 2}
+  ghostMat: {fileID: 2100000, guid: 82fa7a96e2d5a3849a611940083be490, type: 2}
