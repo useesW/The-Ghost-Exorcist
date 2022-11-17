@@ -11,11 +11,6 @@ public struct BoidCalculation : IJob{
     public int endIndex;
 #endregion
 
-#region Chase Perameters
-    public float chaseRange;
-    public Vector3 chaseTargetPosition;
-#endregion 
-
 #region Boid Perameters
     public float aRange;
     public float cRange;
@@ -54,10 +49,6 @@ public struct BoidCalculation : IJob{
                 }
             }
 
-            if((positions[i] - chaseTargetPosition).magnitude < chaseRange){ // Taken Form KinematicBody.cs
-                steers[i] = (steers[i] + (chaseTargetPosition - positions[i])).normalized;
-            }
-
             desiredVelocity.Normalize();
             desiredPosition.Normalize();
             desiredOffset.Normalize();
@@ -86,11 +77,6 @@ public class NPCManager : MonoBehaviour {
     GameObject[] NPCs;
 #endregion
 
-#region Chase Perameters
-    [SerializeField] float chaseBounds;
-    [SerializeField] GameObject chaseTargetObject;
-#endregion 
-
 #region Boid Perameters
     [Header("Boid Perameters")]
     [SerializeField] float alignmentCheckRange = 10.0f;
@@ -101,7 +87,29 @@ public class NPCManager : MonoBehaviour {
     [SerializeField] float seperationFactor = 1.0f;
 #endregion
 
+#region Ghost
+    [Header("Ghost Initialization")]
+    [SerializeField] NavMesh navMesh;
+    [SerializeField] int numGhosts;
+    [SerializeField] bool assignRandomOnPathReached;
+    [SerializeField] List<GameObject> totems;
+    List<int> ghostIndecies;
+    List<int> totemIndecies;
+#endregion
+
     void Awake() {
+        GenerateNPCInstancesInLevel();
+
+        ghostIndecies = new List<int>();
+        AssignGhosts(0,true); // Start by assigning all ghosts
+    }
+
+    void Update() {
+        CreateBoidsJob();
+    }
+
+
+    void GenerateNPCInstancesInLevel(){
         NPCs = new GameObject[totalNPCCoount]; 
         for(int i = 0; i < totalNPCCoount; i++){
             NPCs[i] = (Instantiate( NPC, 
@@ -112,11 +120,44 @@ public class NPCManager : MonoBehaviour {
                             ), 
                         Quaternion.identity, 
                         transform));
-            NPCs[i].GetComponent<NPC>().Initialize(NPCSpeed, obstacleCheckRange, obstacleMask);
+            NPCs[i].GetComponent<NPC>().Initialize(i, this, NPCSpeed, obstacleCheckRange, obstacleMask);
+        }
+    }
+    void AssignGhosts(int ghostIndex, bool overrideAll){
+        int index = -1;
+        if(overrideAll){ // Generate All Ghosts Indecies
+            for(int i = 0; i < numGhosts; i++){
+                do{ // Select a ghost from within NPC list (which is not already contained in Ghost list)
+                    index = Random.Range(0,totalNPCCoount);
+                } while (ghostIndecies.Contains(index));
+                ghostIndecies.Add(index);
+            }
+            foreach(int i in ghostIndecies){
+                NPCs[i].GetComponent<NPC>().AddignIsGhost(true);
+            }
+        } else{
+            do{ // Select a ghost from within NPC list (which is not already contained in Ghost list)
+                    index = Random.Range(0,totalNPCCoount - 1);
+            } while (ghostIndecies.Contains(index));
+            for(int i = 0; i < numGhosts; i++){ // Iterate to ghostIndex
+                if(ghostIndecies[i] == ghostIndex){
+                    // Swap to new Ghost Index
+                    NPCs[ghostIndecies[i]].GetComponent<NPC>().AddignIsGhost(false);
+                    NPCs[index].GetComponent<NPC>().AddignIsGhost(true);
+                    ghostIndecies.RemoveAt(i);
+                    ghostIndecies.Add(index);
+                }
+            }
         }
     }
 
-    void Update() {
+    public List<Vector3> GetPath(int ID_, bool reachedEnd){
+        if(reachedEnd && assignRandomOnPathReached){ AssignGhosts(ID_, false); }
+        int totemIndex = Random.Range(0,totems.Count - 1);
+        return navMesh.FindPath(NPCs[ID_].transform.position, totems[totemIndex].transform.position);
+    }
+    
+    void CreateBoidsJob(){
         NativeArray<Vector3> positions_ = new NativeArray<Vector3>(totalNPCCoount, Allocator.TempJob);
         NativeArray<Vector3> steers_ = new NativeArray<Vector3>(totalNPCCoount, Allocator.TempJob);
         for(int i = 0; i < totalNPCCoount; i++){ // Get current NPC positions and steer directions
@@ -158,9 +199,6 @@ public class NPCManager : MonoBehaviour {
             startingIndex = 0, // change for each job
             endIndex = totalNPCCoount, // change for each job, but cannot exceed this
 
-            chaseRange = chaseBounds,
-            chaseTargetPosition = chaseTargetObject.transform.position,
-
             aRange = alignmentCheckRange,
             cRange = cohesionCheckRange,
             sRange = seperationCheckRange,
@@ -177,10 +215,14 @@ public class NPCManager : MonoBehaviour {
         jHandle.Complete(); // may have to wait for complete
 
         for(int i = job.startingIndex; i < job.endIndex; i++){
+            if(!ghostIndecies.Contains(i)){
+                //NPCs[i].GetComponent<NPC>().SetSteer(job.steers[i]);
+            } 
             NPCs[i].GetComponent<NPC>().SetSteer(job.steers[i]);
         }
 
         positions_.Dispose();
         steers_.Dispose();
     }
+
 }
