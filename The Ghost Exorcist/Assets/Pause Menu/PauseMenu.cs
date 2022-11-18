@@ -42,12 +42,14 @@ public class PauseMenu : MonoBehaviour
 
     public void LoadMenu()
     {
-        SceneManager.LoadScene("Menu");
+        Time.timeScale = 1f;
+        GameisPaused = false;
+        SceneManager.LoadScene(0);
     }
 
     public void QuitGame()
     {
-        Debug.Log("Quitting Game...");
         Application.Quit();
+        UnityEditor.EditorApplication.isPlaying = false; // Exit in Unity Editor
     }
 }
