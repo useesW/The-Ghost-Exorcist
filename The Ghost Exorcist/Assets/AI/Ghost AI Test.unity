@@ -742,16 +742,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 485290026}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &535710955 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 1436285062}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &588427319 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 7922111122617051444}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &654609917
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -911,11 +901,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 830511417}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &904615239 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 654609917}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &918390565
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1077,11 +1062,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7555829157535818411, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
   m_PrefabInstance: {fileID: 1118726333}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1158410670 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 383710235}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1178237738
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,7 +1074,7 @@ GameObject:
   - component: {fileID: 1178237739}
   m_Layer: 0
   m_Name: NPC Manager
-  m_TagString: Untagged
+  m_TagString: NPCManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1128,14 +1108,7 @@ MonoBehaviour:
   navMesh: {fileID: 1507247388}
   numGhosts: 1
   assignRandomOnPathReached: 0
-  totems:
-  - {fileID: 588427319}
-  - {fileID: 535710955}
-  - {fileID: 904615239}
-  - {fileID: 1158410670}
-  - {fileID: 1581010846}
-  - {fileID: 1542338593}
-  - {fileID: 1819516020}
+  totems: []
 --- !u!4 &1178237740
 Transform:
   m_ObjectHideFlags: 0
@@ -1203,8 +1176,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 50
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1227,14 +1200,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1349574799}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 82.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1388961233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1597,7 +1570,7 @@ GameObject:
   - component: {fileID: 1507247388}
   m_Layer: 0
   m_Name: NavMesh
-  m_TagString: Untagged
+  m_TagString: NavMesh
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1635,11 +1608,6 @@ MonoBehaviour:
     m_Bits: 64
   gridWorldSize: {x: 100, y: 100, z: 0}
   nodeRadius: 0.5
---- !u!1 &1542338593 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 458044439}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1559942500
 GameObject:
   m_ObjectHideFlags: 0
@@ -1834,11 +1802,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1561252116}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1581010846 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 918390565}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1608864071
 GameObject:
   m_ObjectHideFlags: 0
@@ -2033,11 +1996,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1724816429}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1819516020 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2634287381434878621, guid: f851b7900818fdc45b7bc8a8848ea538, type: 3}
-  m_PrefabInstance: {fileID: 1118726333}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1821713509
 GameObject:
   m_ObjectHideFlags: 0

@@ -112,7 +112,12 @@ public class NPC : MonoBehaviour {
     }
 
     void CalculateGhostPathSteer(){
-        if(path.Count == 0) {return;}
+        if(path.Count == 0) {
+            if(isGhost){
+                path = manager.GetPath(ID, false);
+            }
+            return;
+        }
 
         if(Vector3.Distance(transform.position, path[pathIndex]) < pathCheckRange){
             if(pathIndex == path.Count - 1){

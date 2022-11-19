@@ -62,6 +62,9 @@ public struct BoidCalculation : IJob{
 
 public class NPCManager : MonoBehaviour {
 
+    NavMesh navMesh;
+    GameObject[] NPCs;
+
 #region Initialization
     [Header("NPC Initialization")]
     [SerializeField] Vector2 spawnBounds = new Vector2(10.0f,10.0f);
@@ -72,9 +75,6 @@ public class NPCManager : MonoBehaviour {
     [SerializeField] float NPCSpeed = 0.1f;
     [SerializeField] float obstacleCheckRange = 5.0f;
     [SerializeField] LayerMask obstacleMask;
-
-
-    GameObject[] NPCs;
 #endregion
 
 #region Boid Perameters
@@ -89,18 +89,21 @@ public class NPCManager : MonoBehaviour {
 
 #region Ghost
     [Header("Ghost Initialization")]
-    [SerializeField] NavMesh navMesh;
     [SerializeField] int numGhosts;
-    [SerializeField] bool assignRandomOnPathReached;
-    [SerializeField] List<GameObject> totems;
+    [SerializeField] bool assignOnPathReached;
+    List<GameObject> totems;
     List<int> ghostIndecies;
-    List<int> totemIndecies;
+    List<int> totemIndecies; // Future use...
 #endregion
 
-    void Awake() {
-        GenerateNPCInstancesInLevel();
-
+    void Start() {
+        navMesh = FindObjectOfType<NavMesh>();
+        totems = new List<GameObject>(GameObject.FindGameObjectsWithTag("Totem"));
         ghostIndecies = new List<int>();
+        totemIndecies = new List<int>();
+
+        navMesh.CreateGrid();
+        GenerateNPCInstancesInLevel();
         AssignGhosts(0,true); // Start by assigning all ghosts
     }
 
@@ -112,14 +115,8 @@ public class NPCManager : MonoBehaviour {
     void GenerateNPCInstancesInLevel(){
         NPCs = new GameObject[totalNPCCoount]; 
         for(int i = 0; i < totalNPCCoount; i++){
-            NPCs[i] = (Instantiate( NPC, 
-                        new Vector3(
-                            Random.Range(-spawnBounds.x,spawnBounds.x),
-                             0.0f,
-                            Random.Range(-spawnBounds.y,spawnBounds.y)
-                            ), 
-                        Quaternion.identity, 
-                        transform));
+            Vector3 spawnPos = navMesh.GetRandomWalkableNodePosition();
+            NPCs[i] = (Instantiate( NPC, spawnPos, Quaternion.identity, transform));
             NPCs[i].GetComponent<NPC>().Initialize(i, this, NPCSpeed, obstacleCheckRange, obstacleMask);
         }
     }
@@ -152,7 +149,7 @@ public class NPCManager : MonoBehaviour {
     }
 
     public List<Vector3> GetPath(int ID_, bool reachedEnd){
-        if(reachedEnd && assignRandomOnPathReached){ AssignGhosts(ID_, false); }
+        if(reachedEnd && assignOnPathReached){ AssignGhosts(ID_, false); }
         int totemIndex = Random.Range(0,totems.Count - 1);
         return navMesh.FindPath(NPCs[ID_].transform.position, totems[totemIndex].transform.position);
     }

@@ -32,11 +32,7 @@ public class NavMesh : MonoBehaviour {
         }
     }
 
-    void Awake() {
-        CreateGrid();
-    }
-
-    void CreateGrid() {
+    public void CreateGrid() {
         // Subdivision of the gird based on the nodeDiameter
         nodeDiameter = nodeRadius * 2; 
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
@@ -56,6 +52,21 @@ public class NavMesh : MonoBehaviour {
                 grid[x, y] = new Node(walkable, worldPoint, x, y);
             }
         }
+    }
+
+    public Vector3 GetRandomWalkableNodePosition(){
+        Vector3 gridPos = Vector3.zero;
+        if(grid == null){
+            Debug.LogError("Grid has not been created yet. Attempting to get absent grid position.");
+        }
+
+        Node n;
+        do{
+            n = grid[Random.Range(0, gridSizeX - 1),Random.Range(0,gridSizeY - 1)];
+        } while (!n.walkable);
+        gridPos = n.worldPosition;
+
+        return gridPos;
     }
 
     public List<Node> GetNeighbours (Node node) {
@@ -101,7 +112,7 @@ public class NavMesh : MonoBehaviour {
         return grid[x, y];
     }
 
-    public List<Vector3> FindPath(Vector3 startPos, Vector3 targetPos) {        
+    public List<Vector3> FindPath(Vector3 startPos, Vector3 targetPos) {  
         Node startNode = NodeFromWolrldPoint(startPos);
         Node targetNode = NodeFromWolrldPoint(targetPos);
 
