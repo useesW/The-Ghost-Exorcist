@@ -4,15 +4,50 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour {
 
-    float movementSpeed = 0.1f;
+    [SerializeField] int ID;
+    NPCManager manager;
+
+#region Movement
+    [Header("Movement Perameters")]
+    [SerializeField] float movementSpeed = 0.1f;
     Vector3 steer;
 
 #region Obstacle Avoidence
-    float obstacleCheckRange = 5.0f;
+    [SerializeField] float obstacleCheckRange = 5.0f;
     LayerMask obstacleMask;
 #endregion
+#endregion
+
+#region Ghost Values
+     [Header("Ghost")]
+     [SerializeField] bool drawPath;
+     Color pathRenderColor;
+     bool isGhost;
+     [SerializeField] float pathCheckRange;
+     [SerializeField] float pathFollowWeigth;
+     [SerializeField] Material NPCMat;
+     [SerializeField] Material ghostMat;
+
+     List<Vector3> path;
+     int pathIndex;
+#endregion
+
+    private void OnDrawGizmos() {
+        if(drawPath && isGhost){
+            foreach(Vector3 nodePos in path){
+                Gizmos.color = pathRenderColor;
+                Gizmos.DrawSphere(nodePos,0.3f);
+            }
+        }
+    }
 
     void Start() {
+        pathRenderColor = Random.ColorHSV(
+                                            0.0f,1.0f,  // Hue
+                                            0.9f,1.0f,  // Sat
+                                            0.5f,1.0f,  // Val
+                                            1.0f,1.0f); // Alpha
+
         steer = new Vector3(
             Random.Range(-movementSpeed,movementSpeed), 
             0.0f, 
@@ -20,6 +55,9 @@ public class NPC : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if(isGhost){
+            CalculateGhostPathSteer();
+        }
         ObstacleCheck();
         SteerCorrection();
         transform.position += steer * movementSpeed; 
@@ -52,10 +90,45 @@ public class NPC : MonoBehaviour {
         steer = newSteer;
     }
 
-    public void Initialize(float speed, float oRange, LayerMask oMask){
+    public void Initialize(int ID_, NPCManager manager_, float speed, float oRange, LayerMask oMask){
+        ID = ID_;
+        manager = manager_;
         movementSpeed = speed;
         obstacleCheckRange = oRange;
         obstacleMask = oMask;
+        isGhost = false;
+        path = new List<Vector3>();
+    }
+
+    public void AddignIsGhost(bool isGhost_){
+        isGhost = isGhost_;
+        if(isGhost){
+            GetComponentInChildren<Renderer>().material = ghostMat;
+            path = manager.GetPath(ID, false);
+            pathIndex = 0;
+        }else{
+            GetComponentInChildren<Renderer>().material = NPCMat;
+        }
+    }
+
+    void CalculateGhostPathSteer(){
+        if(path.Count == 0) {
+            if(isGhost){
+                path = manager.GetPath(ID, false);
+            }
+            return;
+        }
+
+        if(Vector3.Distance(transform.position, path[pathIndex]) < pathCheckRange){
+            if(pathIndex == path.Count - 1){
+                path = manager.GetPath(ID, true);
+                pathIndex = 0;
+            } else {
+                pathIndex++;
+            }
+        }
+        steer += pathFollowWeigth * (path[pathIndex] - transform.position).normalized;
+        steer.Normalize();
     }
 #endregion
 
