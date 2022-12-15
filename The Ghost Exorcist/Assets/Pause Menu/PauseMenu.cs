@@ -8,6 +8,11 @@ public class PauseMenu : MonoBehaviour
     // Start is called before the first frame update
     public static bool GameisPaused = false;
     public GameObject PauseMenuUI;
+    public GameObject HUDUI;
+
+    private void Start() {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
     // Update is called once per frame
     void Update()
@@ -28,13 +33,17 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
+        Cursor.lockState = CursorLockMode.Locked;
         PauseMenuUI.SetActive(false);
+        HUDUI.SetActive(true);
         Time.timeScale = 1f;
         GameisPaused = false;
     }
 
     void Pause()
     {
+        Cursor.lockState = CursorLockMode.None;
+        HUDUI.SetActive(false);
         PauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         GameisPaused = true;

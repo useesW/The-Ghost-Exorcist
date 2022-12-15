@@ -13,7 +13,7 @@ public class Mouse_Look : MonoBehaviour
     void Start()
     {
         //locks the cursor to stay on screen and not go off to prevent weird camera turns
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -34,4 +34,3 @@ public class Mouse_Look : MonoBehaviour
 
     }
 }
-

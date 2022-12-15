@@ -62,6 +62,12 @@ public struct BoidCalculation : IJob{
 
 public class NPCManager : MonoBehaviour {
 
+    #region Win/Lose Sates
+    [Header("Win & Lose States")]
+    [SerializeField] int loseStateTotemsCollected;
+    int numTotemsCollected;
+    int numGhostKilled;
+    #endregion
     NavMesh navMesh;
     GameObject[] NPCs;
 
@@ -91,16 +97,26 @@ public class NPCManager : MonoBehaviour {
     [Header("Ghost Initialization")]
     [SerializeField] int numGhosts;
     [SerializeField] bool assignOnPathReached;
-    List<GameObject> totems;
+    public List<GameObject> totems;
+    public List<GameObject> shrines;
     List<int> ghostIndecies;
-    List<int> totemIndecies; // Future use...
+    List<int> totemIndecies;
 #endregion
 
     void Start() {
         navMesh = FindObjectOfType<NavMesh>();
         totems = new List<GameObject>(GameObject.FindGameObjectsWithTag("Totem"));
+        shrines = new List<GameObject>(GameObject.FindGameObjectsWithTag("Shrine"));
+
+        for(int i = 0; i < totems.Count; i++){
+            totems[i].GetComponent<Totem>().setID(i);
+        }
+
         ghostIndecies = new List<int>();
         totemIndecies = new List<int>();
+
+        HUD.SetGhostCounter(numGhostKilled, numGhosts - numGhostKilled);
+        HUD.SetTotemCounter(numTotemsCollected, loseStateTotemsCollected - numTotemsCollected);
 
         navMesh.CreateGrid();
         GenerateNPCInstancesInLevel();
@@ -148,9 +164,27 @@ public class NPCManager : MonoBehaviour {
         }
     }
 
-    public List<Vector3> GetPath(int ID_, bool reachedEnd){
+    public List<Vector3> GetPath(int ID_, bool reachedEnd, bool reachedTotem, bool isHoldingTotem){
         if(reachedEnd && assignOnPathReached){ AssignGhosts(ID_, false); }
-        int totemIndex = Random.Range(0,totems.Count - 1);
+        if (reachedEnd && reachedTotem){
+            for(int t = 0; t < totems.Count; t++){
+                if(totems[t].GetComponent<Totem>().ghostID == ID_){
+                    GameObject setDelete = totems[t];
+                    totemIndecies.Remove(totems[t].gameObject.GetComponent<Totem>().totemID);
+                    totems.RemoveAt(t);
+                    Destroy(setDelete);
+                    TotemCollected(false);
+                }
+            }
+            int shrineIndex = Random.Range(0,shrines.Count - 1);
+            return navMesh.FindPath(NPCs[ID_].transform.position, shrines[shrineIndex].transform.position);
+        } if(reachedEnd && !reachedTotem && isHoldingTotem){TotemCollected(true);}
+        int totemIndex;
+        do{
+            totemIndex = Random.Range(0,totems.Count - 1);
+        } while(totemIndecies.Count > 0 && totemIndecies.Contains(totemIndex));
+        totemIndecies.Add(totemIndex);
+        totems[totemIndex].GetComponent<Totem>().setGhostID(ID_);
         return navMesh.FindPath(NPCs[ID_].transform.position, totems[totemIndex].transform.position);
     }
     
@@ -220,6 +254,39 @@ public class NPCManager : MonoBehaviour {
 
         positions_.Dispose();
         steers_.Dispose();
+    }
+
+
+    public HUDController HUD;
+
+    public void TotemCollected(bool placed){
+        if(!placed){
+            //Debug.Log("Totem Grabbed");
+        }
+        else{
+            numTotemsCollected++;
+            HUD.SetTotemCounter(numTotemsCollected, loseStateTotemsCollected - numTotemsCollected);
+            //Debug.Log("Totem Placed: " + totems.Count + " Remain");
+        }
+        
+        CheckWinLoseStates();
+    }
+
+    public void GhostKilled(){
+        numGhostKilled++;
+        HUD.SetGhostCounter(numGhostKilled, numGhosts - numGhostKilled);
+        CheckWinLoseStates();
+        //Debug.Log(numGhosts - numGhostKilled + " Ghosts Remain");;
+    }
+
+    void CheckWinLoseStates(){
+        if (numTotemsCollected == loseStateTotemsCollected){
+            HUD.ActivateLose();
+            //Debug.Log("You Lose!!!");
+        } else if (numGhostKilled == numGhosts){
+            HUD.ActivateWin();
+            //Debug.Log("You Win!!!");
+        }
     }
 
 }

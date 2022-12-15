@@ -7,6 +7,7 @@ TagManager:
   - NPCManager
   - NavMesh
   - Totem
+  - Shrine
   layers:
   - Default
   - TransparentFX
@@ -15,8 +16,8 @@ TagManager:
   - Water
   - UI
   - Unwalkable
-  - 
-  - 
+  - Shrine
+  - NPC
   - 
   - 
   - 
