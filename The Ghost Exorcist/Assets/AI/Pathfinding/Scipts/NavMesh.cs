@@ -21,7 +21,7 @@ public class NavMesh : MonoBehaviour {
             if (grid != null) {
                 foreach (Node n in grid) {
                     if(n.walkable){
-                        Gizmos.color = new Color(227.0f,227.0f,227.0f,0.1f);
+                        Gizmos.color = new Color(50.0f,50.0f,50.0f,0.1f);
                         Gizmos.DrawWireCube(n.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
                     } else{
                         Gizmos.color = Color.red;
@@ -101,8 +101,8 @@ public class NavMesh : MonoBehaviour {
 
         //Debug.Log(Mathf.RoundToInt(gridWorldSize.x / (nodeRadius * 2)));
         // Use percentage to convert from world position to grid position (percent complete of grid bound)
-        float valX = (Mathf.RoundToInt(gridWorldSize.x / (nodeRadius * 2)) - 1) * percentX;
-        float valY = (Mathf.RoundToInt(gridWorldSize.y / (nodeRadius * 2)) - 1) * percentY;
+        //float valX = (Mathf.RoundToInt(gridWorldSize.x / (nodeRadius * 2)) - 1) * percentX;
+        //float valY = (Mathf.RoundToInt(gridWorldSize.y / (nodeRadius * 2)) - 1) * percentY;
         //int x = Mathf.RoundToInt(valX);
         //int y = Mathf.RoundToInt(valY);
         

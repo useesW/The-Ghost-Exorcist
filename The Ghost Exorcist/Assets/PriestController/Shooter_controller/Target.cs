@@ -3,8 +3,17 @@ using UnityEngine;
 
 public class Target : MonoBehaviour
 {
-    public float Health = 50f;
+     NPC n;
+    public float maxHealth = 100;
+    float Health;
 
+    private void Start() {
+        Health = maxHealth;
+    }
+    private void Update() {
+        Health += 5;
+        Health = Mathf.Clamp(Health, 0, maxHealth);
+    }
     public void TakeDamage ( float amount)
     {
         Health -= amount;
@@ -14,9 +23,14 @@ public class Target : MonoBehaviour
         }
     }
 
+    public void SetNPC(NPC n_){
+        n = n_;
+    }
+    
     void Die()
     {
-        Destroy(gameObject);
+        n.UnPossess();
+        //Destroy(gameObject);
     }
 
 

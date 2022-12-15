@@ -7,6 +7,8 @@ public class NPC : MonoBehaviour {
     [SerializeField] int ID;
     NPCManager manager;
 
+    Target target_;
+
 #region Movement
     [Header("Movement Perameters")]
     [SerializeField] float movementSpeed = 0.1f;
@@ -27,7 +29,8 @@ public class NPC : MonoBehaviour {
      [SerializeField] float pathFollowWeigth;
      [SerializeField] Material NPCMat;
      [SerializeField] Material ghostMat;
-
+     [SerializeField] GameObject totemMarker;
+     bool holdingTotem;
      List<Vector3> path;
      int pathIndex;
 #endregion
@@ -52,6 +55,10 @@ public class NPC : MonoBehaviour {
             Random.Range(-movementSpeed,movementSpeed), 
             0.0f, 
             Random.Range(-movementSpeed,movementSpeed)).normalized;
+
+        totemMarker.SetActive(false);
+        target_ = GetComponentInChildren<Target>();
+        target_.SetNPC(this);
     }
 
     void FixedUpdate() {
@@ -103,8 +110,9 @@ public class NPC : MonoBehaviour {
     public void AddignIsGhost(bool isGhost_){
         isGhost = isGhost_;
         if(isGhost){
-            GetComponentInChildren<Renderer>().material = ghostMat;
-            path = manager.GetPath(ID, false);
+            //GetComponentInChildren<Renderer>().material = ghostMat;
+            path = manager.GetPath(ID, false, false, holdingTotem);
+            holdingTotem = false;
             pathIndex = 0;
         }else{
             GetComponentInChildren<Renderer>().material = NPCMat;
@@ -114,14 +122,23 @@ public class NPC : MonoBehaviour {
     void CalculateGhostPathSteer(){
         if(path.Count == 0) {
             if(isGhost){
-                path = manager.GetPath(ID, false);
+                path = manager.GetPath(ID, false,false, holdingTotem);
             }
             return;
         }
 
         if(Vector3.Distance(transform.position, path[pathIndex]) < pathCheckRange){
             if(pathIndex == path.Count - 1){
-                path = manager.GetPath(ID, true);
+                if(holdingTotem){
+                    path = manager.GetPath(ID, true, false, holdingTotem);
+                    totemMarker.SetActive(false);
+                    holdingTotem = false;
+                }
+                else if(!holdingTotem){
+                    path = manager.GetPath(ID, true, true, holdingTotem);
+                    totemMarker.SetActive(true);
+                    holdingTotem = true;
+                }
                 pathIndex = 0;
             } else {
                 pathIndex++;
@@ -131,5 +148,14 @@ public class NPC : MonoBehaviour {
         steer.Normalize();
     }
 #endregion
+
+public void UnPossess(){
+    if(!isGhost){return;}
+    isGhost = false;
+    totemMarker.SetActive(false);
+    holdingTotem = false;
+    GetComponentInChildren<Renderer>().material = NPCMat;
+    manager.GhostKilled();
+}
 
 }
